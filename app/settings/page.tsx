@@ -1,11 +1,25 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useAuthQuery as useQuery, useAuthMutation as useMutation } from "@/lib/auth-context";
+import {
+  useAuthQuery as useQuery,
+  useAuthMutation as useMutation,
+} from "@/lib/auth-context";
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
-import { LogOut, Mail, ShieldCheck, Database, User, Camera, Phone, Check, Loader2, AlertCircle } from "lucide-react";
+import {
+  LogOut,
+  Mail,
+  ShieldCheck,
+  Database,
+  User,
+  Camera,
+  Phone,
+  Check,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
 import { useApp } from "@/lib/context_fixed";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +32,7 @@ export default function SettingsPage() {
   const updateProfile = useMutation(api.settings.updateProfile);
   const { theme } = useApp();
   const router = useRouter();
-  
+
   // States for profile editing
   const [name, setName] = useState("");
   const [waPhone, setWaPhone] = useState("");
@@ -29,7 +43,7 @@ export default function SettingsPage() {
 
   // Get current user info via Convex
   const data = useQuery(api.settings.getSettings, token ? { token } : "skip");
-  
+
   useEffect(() => {
     if (data?.profile) {
       setName(data.profile.name || "");
@@ -42,7 +56,8 @@ export default function SettingsPage() {
     setSaving(true);
     setError(null);
     try {
-      if (!token) throw new Error("Authentication token missing. Please sign in again.");
+      if (!token)
+        throw new Error("Authentication token missing. Please sign in again.");
       await updateProfile({ name, waPhone, avatar });
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
@@ -83,9 +98,15 @@ export default function SettingsPage() {
       <div className="relative z-10 max-w-2xl mx-auto py-12 px-6 space-y-8">
         {/* Header */}
         <div className="border-b border-white/10 pb-8">
-          <p className="text-xs font-bold tracking-[0.3em] uppercase text-[#8b5cf6] mb-2">Configuration</p>
-          <h1 className="text-5xl font-black tracking-tighter text-foreground italic uppercase">Account</h1>
-          <p className="text-muted-foreground text-sm mt-2">Manage your professional profile and credentials.</p>
+          <p className="text-xs font-bold tracking-[0.3em] uppercase text-[#8b5cf6] mb-2">
+            Configuration
+          </p>
+          <h1 className="text-5xl font-black tracking-tighter text-foreground italic uppercase">
+            Account
+          </h1>
+          <p className="text-muted-foreground text-sm mt-2">
+            Manage your professional profile and credentials.
+          </p>
         </div>
 
         {/* Profile Card */}
@@ -95,7 +116,11 @@ export default function SettingsPage() {
             <div className="relative group">
               <div className="w-32 h-32 rounded-3xl overflow-hidden border-2 border-white/10 bg-white/[0.02] flex items-center justify-center relative shadow-2xl">
                 {avatar ? (
-                  <img src={avatar} alt="Profile" className="w-full h-full object-cover" />
+                  <img
+                    src={avatar}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   <div className="flex flex-col items-center gap-1 opacity-40">
                     <User className="w-12 h-12" />
@@ -104,8 +129,15 @@ export default function SettingsPage() {
                 {/* Hover Overlay */}
                 <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer flex flex-col items-center justify-center gap-2">
                   <Camera className="w-6 h-6 text-white" />
-                  <span className="text-[10px] font-bold text-white uppercase tracking-widest">Change</span>
-                  <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
+                  <span className="text-[10px] font-bold text-white uppercase tracking-widest">
+                    Change
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleAvatarUpload}
+                  />
                 </label>
               </div>
               <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-[#8b5cf6] flex items-center justify-center shadow-lg border-2 border-background">
@@ -117,11 +149,13 @@ export default function SettingsPage() {
             <div className="flex-1 space-y-4 w-full">
               <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-40">Full Name</Label>
+                  <Label className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-40">
+                    Full Name
+                  </Label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-30" />
-                    <Input 
-                      value={name} 
+                    <Input
+                      value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Enter your name"
                       className="pl-10 h-11 border-white/[0.08] bg-white/[0.02] focus:border-[#8b5cf6]/50 rounded-xl transition-all"
@@ -129,11 +163,13 @@ export default function SettingsPage() {
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-40">WhatsApp Number</Label>
+                  <Label className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-40">
+                    WhatsApp Number
+                  </Label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-30" />
-                    <Input 
-                      value={waPhone} 
+                    <Input
+                      value={waPhone}
                       onChange={(e) => setWaPhone(e.target.value)}
                       placeholder="+20 123 456 789"
                       className="pl-10 h-11 border-white/[0.08] bg-white/[0.02] focus:border-[#8b5cf6]/50 rounded-xl transition-all"
@@ -149,8 +185,12 @@ export default function SettingsPage() {
             <div className="flex items-center gap-3">
               <Mail className="w-4 h-4 opacity-30" />
               <div>
-                <div className="text-[10px] font-bold uppercase tracking-widest opacity-40">Registered Email</div>
-                <div className="text-sm font-medium opacity-80">{data?.profile?.email || authUser?.email}</div>
+                <div className="text-[10px] font-bold uppercase tracking-widest opacity-40">
+                  Registered Email
+                </div>
+                <div className="text-sm font-medium opacity-80">
+                  {data?.profile?.email || authUser?.email}
+                </div>
               </div>
             </div>
             <div className="px-2.5 py-1 rounded-full bg-white/[0.05] text-[10px] font-bold opacity-30 uppercase tracking-widest">
@@ -166,18 +206,22 @@ export default function SettingsPage() {
             </div>
           )}
 
-          <Button 
+          <Button
             onClick={handleSaveProfile}
             disabled={saving}
             className={cn(
               "w-full h-12 rounded-xl font-bold uppercase tracking-widest transition-all duration-300",
-              saved ? "bg-green-500 hover:bg-green-600 shadow-[0_0_20px_rgba(34,197,94,0.3)]" : "bg-[#8b5cf6] hover:bg-[#7c3aed] shadow-[0_0_20px_rgba(139,92,246,0.3)]"
+              saved
+                ? "bg-green-500 hover:bg-green-600 shadow-[0_0_20px_rgba(34,197,94,0.3)]"
+                : "bg-[#8b5cf6] hover:bg-[#7c3aed] shadow-[0_0_20px_rgba(139,92,246,0.3)]",
             )}
           >
             {saving ? (
               <Loader2 className="w-5 h-5 animate-spin" />
             ) : saved ? (
-              <><Check className="w-5 h-5 mr-2" /> Changes Saved</>
+              <>
+                <Check className="w-5 h-5 mr-2" /> Changes Saved
+              </>
             ) : (
               "Save Profile Changes"
             )}
@@ -191,8 +235,12 @@ export default function SettingsPage() {
               <ShieldCheck className="w-5 h-5 text-[#8b5cf6]" />
             </div>
             <div>
-              <div className="text-sm font-bold text-foreground">Multi-Tenant Isolation</div>
-              <div className="text-xs text-muted-foreground/60">Your workspace is cryptographically isolated.</div>
+              <div className="text-sm font-bold text-foreground">
+                Multi-Tenant Isolation
+              </div>
+              <div className="text-xs text-muted-foreground/60">
+                Your workspace is cryptographically isolated.
+              </div>
             </div>
             <div className="ml-auto px-2.5 py-1 rounded-full bg-green-500/10 text-green-400 text-[10px] font-bold border border-green-500/20 uppercase tracking-widest">
               Secure
@@ -203,8 +251,12 @@ export default function SettingsPage() {
         {/* Sign Out */}
         <div className="rounded-2xl border border-red-500/20 bg-red-500/[0.03] p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="space-y-1 text-center sm:text-left">
-            <h2 className="text-sm font-bold text-red-500/80 uppercase tracking-[0.2em]">End Session</h2>
-            <p className="text-xs text-muted-foreground/50">Your data will remain safe and isolated.</p>
+            <h2 className="text-sm font-bold text-red-500/80 uppercase tracking-[0.2em]">
+              End Session
+            </h2>
+            <p className="text-xs text-muted-foreground/50">
+              Your data will remain safe and isolated.
+            </p>
           </div>
           <button
             onClick={handleSignOut}
@@ -215,7 +267,9 @@ export default function SettingsPage() {
           </button>
         </div>
 
-        <p className="text-center text-white/20 text-[10px] font-bold uppercase tracking-[0.4em] pb-4">v1.2.0 beta — Agency Pipeline</p>
+        <p className="text-center text-white/20 text-[10px] font-bold uppercase tracking-[0.4em] pb-4">
+          v1.2.0 beta — Agency Pipeline
+        </p>
       </div>
     </div>
   );
