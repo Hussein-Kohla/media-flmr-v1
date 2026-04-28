@@ -65,7 +65,7 @@ export const Select = ({ value, onValueChange, children }: SelectProps) => {
           return open
             ? React.cloneElement(child as any, {
                 className: cn("fixed z-[9999]", child.props.className),
-                onClick: (e: any) => {
+                 onClick: (e: React.MouseEvent) => {
                   e.stopPropagation();
                   const target = e.target?.closest?.("[data-value]");
                   const selectedValue = target?.getAttribute?.("data-value");

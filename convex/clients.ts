@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
 import { getUserIdFromToken, requireUser } from "./helpers";
+import { Doc } from "./_generated/dataModel";
 
 export const listClients = query({
   args: { token: v.optional(v.string()) },
@@ -9,7 +10,7 @@ export const listClients = query({
     if (!userId) return [];
     return await ctx.db
       .query("clients")
-      .withIndex("by_userId", (q: any) => q.eq("userId", userId))
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
       .collect();
   },
 });
@@ -32,30 +33,30 @@ export const listClientsWithStats = query({
     if (!userId) return [];
     const clients = await ctx.db
       .query("clients")
-      .withIndex("by_userId", (q: any) => q.eq("userId", userId))
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
       .collect();
 
     const clientsWithStats = await Promise.all(
-      clients.map(async (client: any) => {
+      clients.map(async (client: Doc<"clients">) => {
         const projects = await ctx.db
           .query("projects")
-          .filter((q: any) => q.eq(q.field("clientId"), client._id))
+          .filter((q) => q.eq(q.field("clientId"), client._id))
           .collect();
         const payments = await ctx.db
           .query("payments")
-          .filter((q: any) => q.eq(q.field("clientId"), client._id))
+          .filter((q) => q.eq(q.field("clientId"), client._id))
           .collect();
         const allEditingCards = await ctx.db
           .query("editing_cards")
-          .filter((q: any) => q.eq(q.field("clientId"), client._id))
+          .filter((q) => q.eq(q.field("clientId"), client._id))
           .collect();
           
-        const totalBudget = payments.reduce((sum: number, p: any) => sum + (p.amount || 0), 0);
+        const totalBudget = payments.reduce((sum: number, p: Doc<"payments">) => sum + (p.amount || 0), 0);
         const totalPaid = payments
-          .filter((p: any) => p.status === "paid" || p.isCompleted === true)
-          .reduce((sum: number, p: any) => sum + (p.paidAmount || 0), 0);
+          .filter((p: Doc<"payments">) => p.status === "paid" || p.isCompleted === true)
+          .reduce((sum: number, p: Doc<"payments">) => sum + (p.paidAmount || 0), 0);
 
-        const latestActivity = [...projects, ...payments, ...allEditingCards].sort((a: any, b: any) => (b._creationTime || 0) - (a._creationTime || 0))[0];
+        const latestActivity = [...projects, ...payments, ...allEditingCards].sort((a, b) => (b._creationTime || 0) - (a._creationTime || 0))[0];
 
         return {
           ...client,

@@ -9,7 +9,7 @@ export const listEditingCards = query({
     if (!userId) return [];
     return await ctx.db
       .query("editing_cards")
-      .withIndex("by_userId", (q: any) => q.eq("userId", userId))
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
       .collect();
   },
 });

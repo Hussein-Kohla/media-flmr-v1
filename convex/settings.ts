@@ -11,7 +11,7 @@ export const getSettings = query({
     // Fetch individual settings
     const settings = await ctx.db
       .query("settings")
-      .withIndex("by_userId", (q: any) => q.eq("userId", userId))
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
       .first();
       
     // Fetch user profile info
@@ -50,7 +50,7 @@ export const updateSettings = mutation({
     const userId = await requireUser(ctx, token);
     const existing = await ctx.db
       .query("settings")
-      .withIndex("by_userId", (q: any) => q.eq("userId", userId))
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
       .first();
     if (existing) {
       await ctx.db.patch(existing._id, rest);

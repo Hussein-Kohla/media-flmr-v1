@@ -158,8 +158,8 @@ const EditingCardItem = React.memo(
     onEdit: (c: EditingCard) => void;
     onDelete: (id: string) => void;
     onDragStart: (e: React.DragEvent, id: string) => void;
-    t: any;
-    formatDate: any;
+    t: (key: string) => string;
+    formatDate: (date: number | string | Date) => string;
     thumbnailUrl?: string;
   }) => {
     const client = clientMap[card.clientId];
@@ -279,8 +279,8 @@ const inputCls =
 
 export default function EditingPage() {
   const { t, language, formatDate } = useApp();
-  const cards = useQuery(api.editing.listEditingCards, {});
-  const clients = (useQuery(api.clients.listClients, {}) || []) as Client[];
+  const cards = useQuery<{ }, EditingCard[]>(api.editing.listEditingCards, {});
+  const clients = useQuery<{ }, Client[]>(api.clients.listClients, {}) || [];
 
   const createCard = useMutation(api.editing.createEditingCard);
   const updateCard = useMutation(api.editing.updateEditingCard);
@@ -334,7 +334,7 @@ export default function EditingPage() {
 
   const clientMap = useMemo(
     () =>
-      Object.fromEntries(clients.map((c: any) => [c._id, c])) as Record<
+      Object.fromEntries(clients.map((c: Client) => [c._id, c])) as Record<
         string,
         Client
       >,
@@ -347,7 +347,7 @@ export default function EditingPage() {
     today.setHours(0, 0, 0, 0);
     const endOfWeek = new Date(today);
     endOfWeek.setDate(endOfWeek.getDate() + 6);
-    return (cards as EditingCard[]).filter((card: any) => {
+    return (cards || []).filter((card) => {
       const cardDate = new Date(card.dueDate);
       cardDate.setHours(0, 0, 0, 0);
       if (typeFilter !== "all" && card.videoType !== typeFilter) return false;
@@ -370,7 +370,7 @@ export default function EditingPage() {
       done: [],
     };
     if (!cards) return g;
-    filteredCards.forEach((c: any) => g[c.status as keyof typeof g].push(c));
+    filteredCards.forEach((c) => g[c.status as keyof typeof g].push(c));
     return g;
   }, [filteredCards, cards]);
 
@@ -518,7 +518,7 @@ export default function EditingPage() {
       const cardId = e.dataTransfer.getData("cardId") as Id<"editing_cards">;
       if (cardId) {
         const originalStatus = cards?.find(
-          (c: any) => c._id === cardId,
+          (c: EditingCard) => c._id === cardId,
         )?.status;
         try {
           await setStatus({ id: cardId, status });
@@ -650,7 +650,7 @@ export default function EditingPage() {
           <option value="all" className="bg-card">
             {t("all_clients")}
           </option>
-          {clients.map((c: any) => (
+           {clients.map((c: Client) => (
             <option key={c._id} value={c._id} className="bg-card">
               {c.name}
             </option>

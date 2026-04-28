@@ -9,8 +9,8 @@ export const listPaymentsByClient = query({
     if (!userId) return [];
     return await ctx.db
       .query("payments")
-      .withIndex("by_userId", (q: any) => q.eq("userId", userId))
-      .filter((q: any) => q.eq(q.field("clientId"), args.clientId))
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .filter((q) => q.eq(q.field("clientId"), args.clientId))
       .collect();
   },
 });

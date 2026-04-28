@@ -76,7 +76,7 @@ function ClientModal({
 }: {
   open: boolean;
   onClose: () => void;
-  clientToEdit?: any;
+   clientToEdit?: Client;
 }) {
   const createClient = useMutation(api.clients.createClient);
   const updateClient = useMutation(api.clients.updateClient);
@@ -280,7 +280,7 @@ function AvatarModal({
 }: {
   open: boolean;
   onClose: () => void;
-  client: any;
+   client: Client;
   onSave: (avatarUrl: string) => void;
 }) {
   const [selected, setSelected] = useState<string>("");
@@ -418,11 +418,11 @@ function ClientCard({
   onViewDetails,
   onUpdateAvatar,
 }: {
-  client: any;
+   client: Client;
   index: number;
-  onEdit: (c: any) => void;
+   onEdit: (c: Client) => void;
   onViewDetails: (id: string) => void;
-  onUpdateAvatar: (c: any) => void;
+   onUpdateAvatar: (c: Client) => void;
 }) {
   const stats = client.stats || {
     totalBudget: 0,
@@ -521,7 +521,7 @@ function ClientRow({
   index,
   onViewDetails,
 }: {
-  client: any;
+   client: Client;
   index: number;
   onViewDetails: (id: string) => void;
 }) {
@@ -600,11 +600,11 @@ export default function ClientsPage() {
   const [activeTab, setActiveTab] = useState<"active" | "paused" | "archived">(
     "active",
   );
-  const [editingClient, setEditingClient] = useState<any>(null);
+   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showAvatarModal, setShowAvatarModal] = useState(false);
-  const [avatarClient, setAvatarClient] = useState<any>(null);
+   const [avatarClient, setAvatarClient] = useState<Client | null>(null);
   const updateClient = useMutation(api.clients.updateClient);
 
   const openDetailModal = (id: string) => {
@@ -615,7 +615,7 @@ export default function ClientsPage() {
   const filteredClients = useMemo(() => {
     if (!clients) return [];
     const q = search.toLowerCase();
-    return clients.filter((c: any) => {
+     return clients.filter((c: Client) => {
       const matchesSearch =
         c.name.toLowerCase().includes(q) ||
         c.company?.toLowerCase().includes(q) ||
@@ -636,12 +636,12 @@ export default function ClientsPage() {
     setShowModal(true);
   };
 
-  const openEditModal = (client: any) => {
+   const openEditModal = (client: Client) => {
     setEditingClient(client);
     setShowModal(true);
   };
 
-  const openAvatarModal = (client: any) => {
+   const openAvatarModal = (client: Client) => {
     setAvatarClient(client);
     setShowAvatarModal(true);
   };
@@ -801,7 +801,7 @@ export default function ClientsPage() {
                 : "flex flex-col gap-0 border-t-2 border-[var(--color-border)]",
             )}
           >
-            {filteredClients.map((client: any, i: number) =>
+             {filteredClients.map((client: Client, i: number) =>
               view === "grid" ? (
                 <ClientCard
                   key={client._id}

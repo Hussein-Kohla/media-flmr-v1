@@ -35,7 +35,7 @@ import {
   Users,
   ArrowUpRight,
 } from "lucide-react";
-import { Project } from "@/types";
+import { Project, Payment, Note } from "@/types";
 import { Id } from "@/convex/_generated/dataModel";
 import { StatusBadge, ClientAvatar } from "@/components/ui/DataDisplay";
 import {
@@ -99,9 +99,9 @@ function StickyNote({
   deleteNote,
   onClick,
 }: {
-  note: any;
-  updateNote: any;
-  deleteNote: any;
+  note: Note;
+  updateNote: (args: { noteId: string; content: string }) => Promise<void>;
+  deleteNote: (args: { noteId: string }) => Promise<void>;
   onClick: () => void;
 }) {
   const colors =
@@ -158,8 +158,8 @@ function ExpandedNoteModal({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  note: any;
-  updateNote: any;
+  note: Note;
+  updateNote: (args: { noteId: string; content: string }) => Promise<void>;
 }) {
   const [content, setContent] = useState("");
 
@@ -308,15 +308,15 @@ function SimpleStatusSelect({
 }
 
 export default function ClientDetailView({ clientId }: ClientDetailViewProps) {
-  const client = useQuery(api.clients.getClient, {
+  const client = useQuery<{ id: Id<"clients"> }, Client>(api.clients.getClient, {
     id: clientId as Id<"clients">,
   });
-  const projects = (useQuery(api.projects.listProjectsByClient, {
+  const projects = useQuery<{ clientId: Id<"clients"> }, Project[]>(api.projects.listProjectsByClient, {
     clientId: clientId as Id<"clients">,
-  }) || []) as Project[];
-  const payments = (useQuery(api.payments.listPaymentsByClient, {
+  }) || [];
+  const payments = useQuery<{ clientId: Id<"clients"> }, Payment[]>(api.payments.listPaymentsByClient, {
     clientId: clientId as Id<"clients">,
-  }) || []) as any[];
+  }) || [];
 
   const updateClient = useMutation(api.clients.updateClient);
   const deleteClientMutation = useMutation(api.clients.deleteClient);
@@ -338,7 +338,7 @@ export default function ClientDetailView({ clientId }: ClientDetailViewProps) {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
-  const [selectedNote, setSelectedNote] = useState<any>(null);
+   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [isExpandedNoteOpen, setIsExpandedNoteOpen] = useState(false);
   const [contactForm, setContactForm] = useState({
     email: "",
@@ -469,7 +469,7 @@ export default function ClientDetailView({ clientId }: ClientDetailViewProps) {
     }
   };
 
-  const handleEditPayment = (payment: any) => {
+   const handleEditPayment = (payment: Payment) => {
     setPaymentForm({
       amount: payment.amount?.toString() || "",
       paidAmount: payment.paidAmount?.toString() || "",

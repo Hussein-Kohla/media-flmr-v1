@@ -61,9 +61,9 @@ export default function SettingsPage() {
       await updateProfile({ name, waPhone, avatar });
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setError(err?.message || "Failed to update profile. Please try again.");
+      setError(err instanceof Error ? err.message : "Failed to update profile. Please try again.");
     } finally {
       setSaving(false);
     }

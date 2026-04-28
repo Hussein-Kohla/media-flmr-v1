@@ -66,13 +66,13 @@ export default function Home() {
   }, []);
 
   const todayTasks = useMemo(
-    () => (tasks ?? []).filter((t: any) => t.date === today),
+    () => (tasks ?? []).filter((t: CalendarTask) => t.date === today),
     [tasks, today],
   );
 
   const activeProjects = useMemo(
     () =>
-      (projects ?? []).filter((p: any) => p.status === "active" || !p.status),
+      (projects ?? []).filter((p: Project) => p.status === "active" || !p.status),
     [projects],
   );
 
@@ -86,7 +86,7 @@ export default function Home() {
     { label: "Today's Tasks", value: todayTasks.length, href: "/calendar" },
     {
       label: "Publishing",
-      value: (projects ?? []).filter((p: any) => p.status === "publishing")
+       value: (projects ?? []).filter((p: Project) => p.status === "publishing")
         .length,
       href: "/publishing",
     },
@@ -95,8 +95,8 @@ export default function Home() {
   const upcomingTasks = useMemo(
     () =>
       [...(tasks ?? [])]
-        .filter((t: any) => t.date >= today)
-        .sort((a: any, b: any) =>
+         .filter((t: CalendarTask) => t.date >= today)
+         .sort((a: CalendarTask, b: CalendarTask) =>
           `${a.date}${a.time}`.localeCompare(`${b.date}${b.time}`),
         )
         .slice(0, 6),
@@ -210,7 +210,7 @@ export default function Home() {
           </div>
 
           <div className="grid gap-4">
-            {upcomingTasks.slice(0, 3).map((task: any, i: number) => (
+             {upcomingTasks.slice(0, 3).map((task: CalendarTask, i: number) => (
               <div
                 key={task._id || i}
                 className="group relative p-6 rounded-[1.5rem] bg-black border border-white/5 transition-all duration-300 hover:scale-[1.02] hover:border-white/15 hover:bg-white/[0.03]"

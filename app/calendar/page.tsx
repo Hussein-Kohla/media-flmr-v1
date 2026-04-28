@@ -81,9 +81,16 @@ const CalendarTaskItem = React.memo(({
   openEdit, handleResize, updateTask, clientMap, projectMap, taskConfig 
 }: { 
   task: CalendarTask; colIndex: number; weekDays: Date[]; 
-  resizingTask: any; setResizingTask: any; setIsResizing: any; isResizing: boolean;
-  openEdit: any; handleResize: any; updateTask: any; 
-  clientMap: any; projectMap: any; taskConfig: any;
+    resizingTask: { id: string; height: number; type: "top" | "bottom" } | null; 
+    setResizingTask: React.Dispatch<React.SetStateAction<{ id: string; height: number; type: "top" | "bottom" } | null>>; 
+    setIsResizing: React.Dispatch<React.SetStateAction<boolean>>; 
+    isResizing: boolean;
+    openEdit: (task: CalendarTask) => void; 
+    handleResize: (task: CalendarTask, duration: number) => Promise<void>; 
+    updateTask: (args: any) => Promise<void>; 
+    clientMap: Record<string, Client>; 
+    projectMap: Record<string, Project>; 
+    taskConfig: Record<TaskType, { label: string; color: string; dot: string }>;
 }) => {
   let top = 0;
   let height = 80; 
@@ -309,7 +316,7 @@ const formClasses = {
 const FormFields = React.memo(({ 
   t, form, sync, clients, projects 
 }: { 
-  t: any; form: FormState; sync: (field: keyof FormState, val: any) => void; clients: Client[]; projects: Project[] 
+  t: (key: string) => string; form: FormState; sync: (field: keyof FormState, val: any) => void; clients: Client[]; projects: Project[] 
 }) => (
   <div className="space-y-4 py-4">
      <div className="space-y-1.5">

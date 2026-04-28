@@ -18,7 +18,7 @@ export const migrateOldData = mutation({
     let migratedCount = 0;
 
     // 2. Helper to migrate a table
-    const migrateTable = async (table: any) => {
+    const migrateTable = async (table: string) => {
       const records = await ctx.db.query(table).collect();
       for (const record of records) {
         if (!record.userId) {

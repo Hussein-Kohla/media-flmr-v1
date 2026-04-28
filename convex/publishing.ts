@@ -9,7 +9,7 @@ export const listPublishingPosts = query({
     if (!userId) return [];
     return await ctx.db
       .query("publishing_posts")
-      .withIndex("by_userId", (q: any) => q.eq("userId", userId))
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
       .collect();
   },
 });

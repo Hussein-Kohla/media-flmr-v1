@@ -1,6 +1,7 @@
 import * as React from "react"
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { Client } from "@/types"
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -94,7 +95,7 @@ const ProgressBar = ({ progress, className }: ProgressBarProps) => {
 
 // --- ClientAvatar ---
 interface ClientAvatarProps {
-  client?: { name?: string; color?: string; avatar?: string; [key: string]: any };
+  client?: Client;
   size?: number; // Tailwind typical sizing, 6 = 24px (1.5rem), 8 = 32px (2rem), 10 = 40px (2.5rem)
   className?: string;
 }

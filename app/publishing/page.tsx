@@ -72,9 +72,9 @@ function PostSkeleton() {
 
 export default function PublishingPage() {
   const { t, language, formatDate, formatDateTime } = useApp();
-  const posts         = useQuery(api.publishing.listPublishingPosts, {}) as PublishingPost[] | undefined;
-  const clients       = useQuery(api.clients.listClients, {}) as Client[] | undefined;
-  const editingCards  = useQuery(api.editing.listEditingCards, {}) as EditingCard[] | undefined;
+  const posts         = useQuery<{ }, PublishingPost[]>(api.publishing.listPublishingPosts, {});
+  const clients       = useQuery<{ }, Client[]>(api.clients.listClients, {});
+  const editingCards  = useQuery<{ }, EditingCard[]>(api.editing.listEditingCards, {});
   
   const createPost    = useMutation(api.publishing.createPublishingPost);
   const updatePost    = useMutation(api.publishing.updatePublishingPost);
@@ -87,8 +87,8 @@ export default function PublishingPage() {
   const [form, setForm]               = useState(emptyForm());
   const [isSaving, setIsSaving]       = useState(false);
 
-  const clientMap  = useMemo(() => Object.fromEntries((clients || []).map(c => [c._id, c])) as Record<string, Client>, [clients]);
-  const editingMap = useMemo(() => Object.fromEntries((editingCards || []).map(c => [c._id, c])) as Record<string, EditingCard>, [editingCards]);
+  const clientMap  = useMemo(() => Object.fromEntries((clients || []).map((c: Client) => [c._id, c])) as Record<string, Client>, [clients]);
+  const editingMap = useMemo(() => Object.fromEntries((editingCards || []).map((c: EditingCard) => [c._id, c])) as Record<string, EditingCard>, [editingCards]);
 
   useEffect(() => {
     if (!open) return;
@@ -165,9 +165,9 @@ export default function PublishingPage() {
   // Summary counts
   const counts = useMemo(() => ({
     total:      posts?.length || 0,
-    published:  posts?.filter(p => p.status === "published").length || 0,
-    ready:      posts?.filter(p => p.status === "ready").length || 0,
-    overdue:    posts?.filter(p => isOverdue(p.publishDate) && p.status !== "published").length || 0,
+     published:  posts?.filter((p: PublishingPost) => p.status === "published").length || 0,
+     ready:      posts?.filter((p: PublishingPost) => p.status === "ready").length || 0,
+     overdue:    posts?.filter((p: PublishingPost) => isOverdue(p.publishDate) && p.status !== "published").length || 0,
   }), [posts, isOverdue]);
 
   // Form helpers
@@ -228,7 +228,7 @@ export default function PublishingPage() {
           <select value={clientFilter} onChange={e => setClientFilter(e.target.value)}
             className="h-8 rounded-lg border border-white/10 bg-white/[0.05] px-2 text-xs text-white focus:outline-none min-w-[160px]">
              <option value="all" className="bg-[#0f1117]">{t("all_clients")}</option>
-            {clients?.map(c => <option key={c._id} value={c._id} className="bg-[#0f1117]">{c.name}</option>)}
+                     {clients?.map((c: Client) => <option key={c._id} value={c._id} className="bg-[#0f1117]">{c.name}</option>)}
           </select>
         )}
         <span className="ml-auto text-xs text-white/30">{filteredPosts.length} {t("publishing")}</span>
@@ -339,7 +339,7 @@ export default function PublishingPage() {
       )}
 
       {/* Dialog */}
-      <Dialog open={open} onOpenChange={v => { setOpen(v); if (!v) setEditingPost(null); }}>
+      <Dialog open={open} onOpenChange={(v: boolean) => { setOpen(v); if (!v) setEditingPost(null); }}>
         <DialogContent className="bg-card border-white/10 text-foreground sm:max-w-[700px] max-h-[90vh] overflow-y-auto w-[90vw] rounded-2xl">
           <DialogHeader className="mb-2">
             <DialogTitle className="text-foreground text-xl">{editingPost ? t("edit_task") : t("create_post")}</DialogTitle>
@@ -355,7 +355,7 @@ export default function PublishingPage() {
                     onChange={e => sync("clientId", e.target.value as Id<"clients">)}
                     className={selectCls}>
                     <option value="" className="bg-[#0f1117]">{t("select_client_first")}</option>
-                     {clients?.map(cl => <option key={cl._id} value={cl._id} className="bg-[#0f1117]">{cl.name}</option>)}
+                     {clients?.map((cl: Client) => <option key={cl._id} value={cl._id} className="bg-[#0f1117]">{cl.name}</option>)}
                   </select>
                </div>
             </div>
@@ -367,14 +367,14 @@ export default function PublishingPage() {
                     <Label className="text-xs text-muted-foreground">{t("linked_video")}</Label>
                     <select value={form.linkedEditingId}
                       onChange={e => sync("linkedEditingId", e.target.value)} className={selectCls}>
-                      <option value="" className="bg-[#0f1117]">{t("no_video")}</option>
-                       {editingCards?.filter(ed => !form.clientId || ed.clientId === form.clientId).map(ed => (
-                         <option key={ed._id} value={ed._id} className="bg-[#0f1117]">
-                           {ed.title} — ({t(ed.status)})
-                         </option>
-                       ))}
+                       <option value="" className="bg-[#0f1117]">{t("no_video")}</option>
+                        {editingCards?.filter((ed: EditingCard) => !form.clientId || ed.clientId === form.clientId).map((ed: EditingCard) => (
+                          <option key={ed._id} value={ed._id} className="bg-[#0f1117]">
+                            {ed.title} — ({t(ed.status)})
+                          </option>
+                        ))}
                     </select>
-                    {editingCards && form.clientId && !editingCards.some(ed => ed.clientId === form.clientId) && (
+                     {editingCards && form.clientId && !editingCards.some((ed: EditingCard) => ed.clientId === form.clientId) && (
                       <p className="text-[10px] text-amber-400/60 mt-1 flex items-center gap-1">
                         <AlertTriangle className="w-3 h-3" /> {t("no_videos_for_this_client")}
                       </p>
@@ -392,8 +392,8 @@ export default function PublishingPage() {
                </div>
                 <div className="space-y-1.5">
                   <Label className="text-xs text-muted-foreground">{t("task_title")}</Label>
-                  <Input value={form.title} onChange={e => sync("title", e.target.value)}
-                    placeholder={t("title")} className={inputCls} />
+                   <Input value={form.title} onChange={(e: React.ChangeEvent<HTMLInputElement>) => sync("title", e.target.value)}
+                     placeholder={t("title")} className={inputCls} />
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
@@ -401,7 +401,7 @@ export default function PublishingPage() {
                       <Label className="text-xs text-muted-foreground">{t("publish_date")}</Label>
                       <Input type="datetime-local" className={inputCls}
                         value={new Date(form.publishDate - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)}
-                        onChange={e => sync("publishDate", new Date(e.target.value).getTime())} />
+                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => sync("publishDate", new Date(e.target.value).getTime())} />
                     </div>
                     <div className="space-y-1.5">
                       <Label className="text-xs text-muted-foreground">{t("status")}</Label>

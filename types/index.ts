@@ -16,6 +16,12 @@ export interface Client {
   avatarId?: string;
   logoId?: string;
   proofImageId?: string;
+  waPhone?: any;
+  avatar?: string;
+  socials?: string[];
+  createdAt?: number;
+  createdBy?: string;
+  userId?: string;
 }
 
 export type EditingStatus = "pending" | "in_progress" | "done";
@@ -37,6 +43,11 @@ export interface EditingCard {
   notes?: string;
   thumbnailId?: string;
   subTasks: EditingSubTask[];
+  userId?: string;
+  waReminder?: any;
+  waReminderOffset?: any;
+  waReminderPending?: any;
+  waReminderTime?: any;
 }
 
 export type CalendarTaskType = "meeting" | "deadline" | "reminder" | "shoot" | "other";
@@ -55,6 +66,9 @@ export interface CalendarTask {
   clientId?: string;
   projectId?: string;
   notes?: string;
+  userId?: string;
+  waReminder?: any;
+  waPhone?: any;
 }
 
 export interface Project {
@@ -63,13 +77,14 @@ export interface Project {
   clientId: string;
   projectName: string;
   status: "pending" | "in_progress" | "done" | "completed";
-  budget: number;
-  deadline: string;
+  budget?: number;
+  deadline?: string;
   startDate?: string;
   link?: string;
   deliverables: Deliverable[];
   paymentStatus: "unpaid" | "partial" | "paid";
   proofImageId?: string;
+  userId?: string;
 }
 
 export interface Deliverable {
@@ -89,4 +104,31 @@ export interface PublishingPost {
   publishDate: number;
   linkedEditingId?: string;
   status: PublishingStatus;
+  waReminder?: any;
+  waReminderTime?: any;
+  userId?: string;
+}
+
+export interface Payment {
+  _id: string;
+  _creationTime: number;
+  clientId: string;
+  amount: number;
+  date: string;
+  description: string;
+  status?: string;
+  details?: string;
+  isCompleted?: boolean;
+  paidAmount?: number;
+  userId?: string;
+}
+
+export interface Note {
+  _id: string;
+  _creationTime: number;
+  clientId: string;
+  content: string;
+  color: string;
+  updatedAt?: number;
+  userId?: string;
 }

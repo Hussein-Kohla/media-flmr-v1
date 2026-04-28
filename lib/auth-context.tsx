@@ -60,21 +60,24 @@ export function useAuth() {
 }
 
 // Custom wrapper to automatically inject token into args
-export function useAuthQuery(query: any, args?: any) {
+export function useAuthQuery<TArgs extends Record<string, any> | undefined, TReturn>(
+  query: any, 
+  args?: TArgs | "skip"
+): TReturn | undefined {
   const { token } = useAuth();
-  // We only run the query if we have a token, else we pass "skip" (so it doesn't fail).
-  // Wait, if it's "skip", convex returns undefined while skipping.
   if (args === "skip") return useConvexQuery(query, "skip");
   const queryArgs = token ? { ...args, token } : "skip";
   return useConvexQuery(query, queryArgs as any);
 }
 
-export function useAuthMutation(mutation: any) {
+export function useAuthMutation<TArgs extends Record<string, any> | undefined, TReturn>(
+  mutation: any
+) {
   const { token } = useAuth();
   const mutate = useConvexMutation(mutation);
   return useCallback(
-    (args?: any) => {
-      return mutate({ ...args, token });
+    (args?: TArgs) => {
+      return mutate({ ...args, token } as any);
     },
     [mutate, token]
   );
