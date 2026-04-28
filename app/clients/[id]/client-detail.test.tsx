@@ -1,37 +1,39 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import React from "react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-
-// Mock convex/react
-vi.mock("convex/react", () => {
-  return {
-    useQuery: vi.fn(),
-        useMutation: vi.fn(),
-        useConvex: vi.fn(() => ({
-          mutation: vi.fn(),
-                                query: vi.fn(),
-        })),
-  };
-});
-
 import ClientDetailPage from "@/app/clients/detail/page";
 import { useQuery, useMutation } from "convex/react";
+
+// Mock convex/react
+vi.mock("convex/react", () => ({
+  useQuery: vi.fn(),
+  useMutation: vi.fn(),
+  useConvex: vi.fn(() => ({
+    mutation: vi.fn(),
+    query: vi.fn(),
+  })),
+}));
 
 // Mock next/navigation
 vi.mock("next/navigation", () => ({
   useParams: vi.fn(),
-                                  useRouter: vi.fn(() => ({
-                                    push: vi.fn(),
-                                  })),
+  useRouter: vi.fn(() => ({
+    push: vi.fn(),
+  })),
+  useSearchParams: vi.fn(() => ({
+    get: vi.fn((key) => {
+      if (key === "id") return "client1";
+      return null;
+    }),
+  })),
 }));
 
-// Mock the 'use' hook from React
-vi.mock("react", async () => {
-  const actual = await vi.importActual("react");
+// Mock React's 'use' hook safely without breaking types
+vi.mock("react", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("react")>();
   return {
     ...actual,
-    use: (promise: Promise<any>) => {
-      return (promise as any)._resolvedValue || {};
-    },
+    use: vi.fn((promise: any) => promise._resolvedValue || {}),
   };
 });
 
@@ -61,9 +63,9 @@ describe("Client Detail Page", () => {
       ],
       status: "in_progress",
       deadline: Date.now(),
-         startDate: Date.now(),
-         link: "http://example.com",
-         createdBy: "system",
+      startDate: Date.now(),
+      link: "http://example.com",
+      createdBy: "system",
     },
   ];
 
@@ -72,10 +74,10 @@ describe("Client Detail Page", () => {
   });
 
   it("renders page with client details and projects", async () => {
-    const paramsPromise = Promise.resolve({ id: "client1" });
-    (paramsPromise as any)._resolvedValue = { id: "client1" };
+    const paramsPromise = Promise.resolve({ id: "client1" }) as any;
+    paramsPromise._resolvedValue = { id: "client1" };
 
-    vi.mocked(useQuery).mockImplementation((_query, args) => {
+    vi.mocked(useQuery).mockImplementation((_query: any, args: any) => {
       if (args && "id" in args) return mockClient;
       if (args && "clientId" in args) return mockProjects;
       if (args && "storageId" in args) return null;
@@ -91,10 +93,10 @@ describe("Client Detail Page", () => {
   });
 
   it("simulates the create project flow", async () => {
-    const paramsPromise = Promise.resolve({ id: "client1" });
-    (paramsPromise as any)._resolvedValue = { id: "client1" };
+    const paramsPromise = Promise.resolve({ id: "client1" }) as any;
+    paramsPromise._resolvedValue = { id: "client1" };
 
-    vi.mocked(useQuery).mockImplementation((_query, args) => {
+    vi.mocked(useQuery).mockImplementation((_query: any, args: any) => {
       if (args && "id" in args) return mockClient;
       if (args && "clientId" in args) return mockProjects;
       if (args && "storageId" in args) return null;
@@ -106,7 +108,9 @@ describe("Client Detail Page", () => {
 
     render(<ClientDetailPage searchParams={paramsPromise} />);
 
-    const addProjectButton = screen.getByRole("button", { name: /add project/i });
+    const addProjectButton = screen.getByRole("button", {
+      name: /add project/i,
+    });
     fireEvent.click(addProjectButton);
 
     expect(await screen.findByText("Add New Project")).toBeInTheDocument();
