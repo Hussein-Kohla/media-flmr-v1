@@ -32,7 +32,7 @@ import {
   CreditCard,
   UserCheck,
 } from "lucide-react";
-import { Project } from "@/types";
+import { Client, Project } from "@/types";
 import { Id } from "@/convex/_generated/dataModel";
 import { StatusBadge, ClientAvatar } from "@/components/ui/DataDisplay";
 
