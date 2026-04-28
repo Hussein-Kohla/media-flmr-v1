@@ -162,7 +162,6 @@ export default function ClientDetailClient() {
     .toUpperCase()
     .substring(0, 2);
 
-  // Proactive fixes: Added (p.budget || 0) and (p.deliverables || [])
   const totalBudget = projects.reduce((sum, p) => sum + (p.budget || 0), 0);
   const totalPaid = projects.reduce(
     (sum, p) =>
@@ -179,10 +178,14 @@ export default function ClientDetailClient() {
     (sum, p) => sum + (p.deliverables?.length || 0),
     0,
   );
+
+  // 🔥 Fix: Filter out projects without a deadline and provide fallback 0 for TypeScript
   const nextDeadline = projects
-    .filter((p) => p.status !== "done")
+    .filter((p) => p.status !== "done" && p.deadline)
     .sort(
-      (a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime(),
+      (a, b) =>
+        new Date(a.deadline || 0).getTime() -
+        new Date(b.deadline || 0).getTime(),
     )[0]?.deadline;
 
   return (
