@@ -48,7 +48,6 @@ export default function ClientDetailClient() {
   const searchParams = useSearchParams();
   const clientId = searchParams.get("id");
 
-  // 🔥 Fix: Added "as any" to explicitly bypass the {} strict typing error
   const client = useQuery(api.clients.getClient, {
     id: clientId as Id<"clients">,
   }) as any;
@@ -162,20 +161,22 @@ export default function ClientDetailClient() {
     .join("")
     .toUpperCase()
     .substring(0, 2);
-  const totalBudget = projects.reduce((sum, p) => sum + p.budget, 0);
+
+  // Proactive fixes: Added (p.budget || 0) and (p.deliverables || [])
+  const totalBudget = projects.reduce((sum, p) => sum + (p.budget || 0), 0);
   const totalPaid = projects.reduce(
     (sum, p) =>
       p.paymentStatus === "paid"
-        ? sum + p.budget
+        ? sum + (p.budget || 0)
         : p.paymentStatus === "partial"
-          ? sum + p.budget * 0.5
+          ? sum + (p.budget || 0) * 0.5
           : sum,
     0,
   );
   const pendingAmount = totalBudget - totalPaid;
   const activeProjects = projects.filter((p) => p.status !== "done").length;
   const totalDeliverables = projects.reduce(
-    (sum, p) => sum + p.deliverables.length,
+    (sum, p) => sum + (p.deliverables?.length || 0),
     0,
   );
   const nextDeadline = projects
@@ -393,12 +394,11 @@ export default function ClientDetailClient() {
                   </tr>
                 ) : (
                   projects.map((project) => {
-                    const completed = project.deliverables.filter(
-                      (d) => d.done,
-                    ).length;
+                    const deliverables = project.deliverables || [];
+                    const completed = deliverables.filter((d) => d.done).length;
                     const progress =
-                      project.deliverables.length > 0
-                        ? (completed / project.deliverables.length) * 100
+                      deliverables.length > 0
+                        ? (completed / deliverables.length) * 100
                         : 0;
                     return (
                       <tr
@@ -411,7 +411,7 @@ export default function ClientDetailClient() {
                               {project.projectName}
                             </span>
                             <span className="text-xs text-muted-foreground">
-                              ${project.budget.toLocaleString()}
+                              ${(project.budget || 0).toLocaleString()}
                             </span>
                           </div>
                         </td>
