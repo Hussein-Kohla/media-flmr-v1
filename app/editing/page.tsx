@@ -370,7 +370,7 @@ export default function EditingPage() {
       done: [],
     };
     if (!cards) return g;
-    filteredCards.forEach((c: any) => g[c.status].push(c));
+    filteredCards.forEach((c: any) => g[c.status as keyof typeof g].push(c));
     return g;
   }, [filteredCards, cards]);
 
