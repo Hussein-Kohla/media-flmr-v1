@@ -801,7 +801,7 @@ export default function ClientsPage() {
                 : "flex flex-col gap-0 border-t-2 border-[var(--color-border)]",
             )}
           >
-            {filteredClients.map((client, i) =>
+            {filteredClients.map((client: any, i: number) =>
               view === "grid" ? (
                 <ClientCard
                   key={client._id}
