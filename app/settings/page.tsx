@@ -124,7 +124,6 @@ export default function SettingsPage() {
                       value={name} 
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Enter your name"
-                      label="Full Name"
                       className="pl-10 h-11 border-white/[0.08] bg-white/[0.02] focus:border-[#8b5cf6]/50 rounded-xl transition-all"
                     />
                   </div>
@@ -137,7 +136,6 @@ export default function SettingsPage() {
                       value={waPhone} 
                       onChange={(e) => setWaPhone(e.target.value)}
                       placeholder="+20 123 456 789"
-                      label="WhatsApp Number"
                       className="pl-10 h-11 border-white/[0.08] bg-white/[0.02] focus:border-[#8b5cf6]/50 rounded-xl transition-all"
                     />
                   </div>
