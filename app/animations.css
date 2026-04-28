@@ -1,0 +1,37 @@
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes fadeUp {
+
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reveal-1 { animation: fadeUp var(--duration-base) var(--ease-out) 0ms forwards; }
+.reveal-2 { animation: fadeUp var(--duration-base) var(--ease-out) 60ms forwards; }
+.reveal-3 { animation: fadeUp var(--duration-base) var(--ease-out) 120ms forwards; }
+.reveal-4 { animation: fadeUp var(--duration-base) var(--ease-out) 180ms forwards; }
+.reveal-5 { animation: fadeUp var(--duration-base) var(--ease-out) 240ms forwards; }
+
+.hover-lift {
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+.hover-scale {
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+.hover-scale:hover {
+  transform: scale(1.01);
+}

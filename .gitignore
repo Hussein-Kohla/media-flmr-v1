@@ -1,0 +1,36 @@
+# env
+.env
+.env.local
+
+# next.js
+.next/
+out/
+
+# node
+node_modules/
+
+# build
+dist/
+build/
+
+# logs
+*.log
+dev.log
+dev_log.txt
+next_dev.log
+
+# IDE
+.vscode/
+.opencode/
+
+# backend
+*.py
+__pycache__/
+*.pyc
+venv/
+.venv/
+backend.log
+api_dev.log
+
+# cache
+*.tsbuildinfo
