@@ -47,9 +47,12 @@ function getStatusVariant(
 export default function ClientDetailClient() {
   const searchParams = useSearchParams();
   const clientId = searchParams.get("id");
+
+  // 🔥 Fix: Added "as any" to explicitly bypass the {} strict typing error
   const client = useQuery(api.clients.getClient, {
     id: clientId as Id<"clients">,
-  });
+  }) as any;
+
   const projects = (useQuery(api.projects.listProjectsByClient, {
     clientId: clientId as Id<"clients">,
   }) || []) as Project[];
