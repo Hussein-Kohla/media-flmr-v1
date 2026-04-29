@@ -536,7 +536,7 @@ export default function ClientDetailView({ clientId }: ClientDetailViewProps) {
     .toUpperCase()
     .substring(0, 2);
 
-  const totalBudget = paymentsList.reduce(
+  const totalBudget = (paymentsList as Payment[]).reduce(
     (sum: number, p: Payment) => sum + (p.amount || 0),
     0,
   );
