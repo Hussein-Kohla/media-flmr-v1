@@ -953,7 +953,7 @@ const nextDeadline = (Array.isArray(projectsList) ? projectsList : [])
                     No sticky notes yet.
                   </p>
                 ) : (
-                  notes.map((note: Note) => (
+                  (Array.isArray(notes) ? notes : []).map((note: any) => (
                     <div
                       key={note._id}
                       className={`w-10 h-10 rounded-lg border-2 shadow-sm transition-transform group-hover:scale-110 ${
