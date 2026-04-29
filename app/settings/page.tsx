@@ -47,10 +47,11 @@ export default function SettingsPage() {
   );
 
   useEffect(() => {
-    if (data?.profile) {
-      setName(data.profile.name || "");
-      setWaPhone(data.profile.waPhone || "");
-      setAvatar(data.profile.avatar || "");
+    const profile = (data as any)?.profile;
+    if (profile) {
+      setName(profile.name || "");
+      setWaPhone(profile.waPhone || "");
+      setAvatar(profile.avatar || "");
     }
   }, [data]);
 
