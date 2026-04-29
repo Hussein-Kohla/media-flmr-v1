@@ -733,7 +733,7 @@ export default function EditingPage() {
                         t={t}
                         formatDate={formatDate}
                         thumbnailUrl={
-                          thumbnailsMap[card.thumbnailId || ""] ?? undefined
+                          (thumbnailsMap as Record<string, any>)[card.thumbnailId || ""] ?? undefined
                         }
                       />
                     ))}
