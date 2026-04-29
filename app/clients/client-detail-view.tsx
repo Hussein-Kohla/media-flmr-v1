@@ -968,7 +968,7 @@ export default function ClientDetailView({ clientId }: ClientDetailViewProps) {
             </div>
             <div className="relative space-y-6">
               <div className="flex flex-wrap gap-3">
-                {(Array.isArray(notes) ? notes.length : 0) === 0 ? (
+                {(Array.isArray(notes) ? notes : []).map((note: any) => (
                   <p className="text-sm font-body text-muted-foreground italic">
                     No sticky notes yet.
                   </p>
