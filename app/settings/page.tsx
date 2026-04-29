@@ -12,7 +12,6 @@ import {
   LogOut,
   Mail,
   ShieldCheck,
-  Database,
   User,
   Camera,
   Phone,
@@ -30,7 +29,7 @@ export default function SettingsPage() {
   const { clearAuth, token, user: authUser } = useAuth();
   const signOutMutation = useMutation(api.auth.signOut);
   const updateProfile = useMutation(api.settings.updateProfile);
-  const { theme } = useApp();
+  const { theme } = useApp(); // kept for future use but not used currently
   const router = useRouter();
 
   // States for profile editing
@@ -41,8 +40,11 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Get current user info via Convex
-  const data = useQuery(api.settings.getSettings, token ? { token } : "skip");
+  // Get current user info via Convex – token is passed only if available
+  const data = useQuery(
+    api.settings.getSettings,
+    token ? { token } : "skip"
+  );
 
   useEffect(() => {
     if (data?.profile) {
@@ -56,14 +58,17 @@ export default function SettingsPage() {
     setSaving(true);
     setError(null);
     try {
-      if (!token)
+      if (!token) {
         throw new Error("Authentication token missing. Please sign in again.");
+      }
       await updateProfile({ name, waPhone, avatar });
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (err: unknown) {
       console.error(err);
-      setError(err instanceof Error ? err.message : "Failed to update profile. Please try again.");
+      setError(
+        err instanceof Error ? err.message : "Failed to update profile. Please try again."
+      );
     } finally {
       setSaving(false);
     }
@@ -81,10 +86,18 @@ export default function SettingsPage() {
   };
 
   const handleSignOut = async () => {
-    if (token) await signOutMutation({ token }).catch(console.error);
-    clearAuth();
-    router.push("/auth");
+    try {
+      if (token) await signOutMutation({ token }).catch(console.error);
+    } catch (err) {
+      console.error("Sign out error:", err);
+    } finally {
+      clearAuth();
+      router.push("/auth");
+    }
   };
+
+  // Display email from either profile or authUser
+  const userEmail = data?.profile?.email ?? authUser?.email ?? "";
 
   return (
     <div className="relative min-h-screen w-full">
@@ -116,6 +129,7 @@ export default function SettingsPage() {
             <div className="relative group">
               <div className="w-32 h-32 rounded-3xl overflow-hidden border-2 border-white/10 bg-white/[0.02] flex items-center justify-center relative shadow-2xl">
                 {avatar ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={avatar}
                     alt="Profile"
@@ -188,9 +202,7 @@ export default function SettingsPage() {
                 <div className="text-[10px] font-bold uppercase tracking-widest opacity-40">
                   Registered Email
                 </div>
-                <div className="text-sm font-medium opacity-80">
-                  {data?.profile?.email || authUser?.email}
-                </div>
+                <div className="text-sm font-medium opacity-80">{userEmail}</div>
               </div>
             </div>
             <div className="px-2.5 py-1 rounded-full bg-white/[0.05] text-[10px] font-bold opacity-30 uppercase tracking-widest">
@@ -213,7 +225,7 @@ export default function SettingsPage() {
               "w-full h-12 rounded-xl font-bold uppercase tracking-widest transition-all duration-300",
               saved
                 ? "bg-green-500 hover:bg-green-600 shadow-[0_0_20px_rgba(34,197,94,0.3)]"
-                : "bg-[#8b5cf6] hover:bg-[#7c3aed] shadow-[0_0_20px_rgba(139,92,246,0.3)]",
+                : "bg-[#8b5cf6] hover:bg-[#7c3aed] shadow-[0_0_20px_rgba(139,92,246,0.3)]"
             )}
           >
             {saving ? (
