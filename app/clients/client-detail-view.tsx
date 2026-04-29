@@ -846,7 +846,7 @@ const nextDeadline = (Array.isArray(projectsList) ? projectsList : [])
                 ) : (
                   (Array.isArray(projectsList) ? projectsList : []).map((project: any) => {
                     const completed = project.deliverables.filter(
-                      (d) => d.done,
+                      (d: any) => d.done,
                     ).length;
                     const progress =
                       project.deliverables.length > 0
