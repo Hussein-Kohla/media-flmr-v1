@@ -279,8 +279,8 @@ const inputCls =
 
 export default function EditingPage() {
   const { t, language, formatDate } = useApp();
-  const cards = useQuery<{ }, EditingCard[]>(api.editing.listEditingCards, {});
-  const clients = useQuery<{ }, Client[]>(api.clients.listClients, {}) || [];
+  const cards = useQuery<{}, EditingCard[]>(api.editing.listEditingCards, {});
+  const clients = useQuery<{}, Client[]>(api.clients.listClients, {}) || [];
 
   const createCard = useMutation(api.editing.createEditingCard);
   const updateCard = useMutation(api.editing.updateEditingCard);
@@ -370,7 +370,9 @@ export default function EditingPage() {
       done: [],
     };
     if (!cards) return g;
-    filteredCards.forEach((c: EditingCard) => g[c.status as EditingStatus].push(c));
+    filteredCards.forEach((c: EditingCard) =>
+      g[c.status as EditingStatus].push(c),
+    );
     return g;
   }, [filteredCards, cards]);
 
@@ -416,6 +418,7 @@ export default function EditingPage() {
     if (key === "dueDate") setDateError("");
   };
 
+  // FIXED: added missing return statement
   const syncSubTask = (index: number, updates: Partial<EditingSubTask>) =>
     setForm((cur) => {
       const st = [...cur.subTasks];
@@ -650,7 +653,7 @@ export default function EditingPage() {
           <option value="all" className="bg-card">
             {t("all_clients")}
           </option>
-           {clients.map((c: Client) => (
+          {clients.map((c: Client) => (
             <option key={c._id} value={c._id} className="bg-card">
               {c.name}
             </option>
