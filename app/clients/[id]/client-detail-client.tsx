@@ -50,7 +50,7 @@ export default function ClientDetailClient() {
 
   const client = useQuery(api.clients.getClient, {
     id: clientId as Id<"clients">,
-  }) as any;
+  }) as Client | undefined | null;
 
   const projects = (useQuery(api.projects.listProjectsByClient, {
     clientId: clientId as Id<"clients">,
@@ -162,13 +162,13 @@ export default function ClientDetailClient() {
     .toUpperCase()
     .substring(0, 2);
 
-  const totalBudget = projects.reduce((sum, p) => sum + (p.budget || 0), 0);
+  const totalBudget = projects.reduce((sum, p) => sum + (p.budget ?? 0), 0);
   const totalPaid = projects.reduce(
     (sum, p) =>
       p.paymentStatus === "paid"
-        ? sum + (p.budget || 0)
+        ? sum + (p.budget ?? 0)
         : p.paymentStatus === "partial"
-          ? sum + (p.budget || 0) * 0.5
+          ? sum + (p.budget ?? 0) * 0.5
           : sum,
     0,
   );
@@ -184,8 +184,8 @@ export default function ClientDetailClient() {
     .filter((p) => p.status !== "done" && p.deadline)
     .sort(
       (a, b) =>
-        new Date(a.deadline || 0).getTime() -
-        new Date(b.deadline || 0).getTime(),
+        new Date(a.deadline ?? 0).getTime() -
+        new Date(b.deadline ?? 0).getTime(),
     )[0]?.deadline;
 
   return (

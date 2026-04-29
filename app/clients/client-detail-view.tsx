@@ -35,7 +35,7 @@ import {
   Users,
   ArrowUpRight,
 } from "lucide-react";
-import { Project, Payment, Note } from "@/types";
+import { Client, Project, Payment, Note } from "@/types";
 import { Id } from "@/convex/_generated/dataModel";
 import { StatusBadge, ClientAvatar } from "@/components/ui/DataDisplay";
 import {
@@ -142,7 +142,7 @@ function StickyNote({
         </div>
       </div>
       <p className={`text-sm font-body line-clamp-4 ${colors.text}`}>
-        {note.content || (
+        {note.content ?? (
           <span className="italic opacity-50">Empty note...</span>
         )}
       </p>
@@ -308,16 +308,13 @@ function SimpleStatusSelect({
 }
 
 export default function ClientDetailView({ clientId }: ClientDetailViewProps) {
-  const client = useQuery<{ id: Id<"clients"> }, Client>(api.clients.getClient, {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const client = useQuery(api.clients.getClient, {
     id: clientId as Id<"clients">,
-  });
-  const projects = useQuery<{ clientId: Id<"clients"> }, Project[]>(api.projects.listProjectsByClient, {
-    clientId: clientId as Id<"clients">,
-  }) || [];
-  const payments = useQuery<{ clientId: Id<"clients"> }, Payment[]>(api.payments.listPaymentsByClient, {
-    clientId: clientId as Id<"clients">,
-  }) || [];
-
+  }) as Client | undefined | null;
+  const projectsList = useQuery(api.projects.listProjectsByClient, { clientId: clientId as Id<"clients"> }) || [];
+  const paymentsList = useQuery(api.payments.listPaymentsByClient, { clientId: clientId as Id<"clients"> }) || [];
+  const notes = useQuery(api.notes.listNotesByClient, { clientId: clientId as Id<"clients"> }) || [];
   const updateClient = useMutation(api.clients.updateClient);
   const deleteClientMutation = useMutation(api.clients.deleteClient);
   const deleteProject = useMutation(api.projects.deleteProject);
@@ -328,12 +325,6 @@ export default function ClientDetailView({ clientId }: ClientDetailViewProps) {
   const createNote = useMutation(api.notes.createNote);
   const updateNote = useMutation(api.notes.updateNote);
   const deleteNote = useMutation(api.notes.deleteNote);
-  const notes =
-    useQuery(api.notes.listNotesByClient, {
-      clientId: clientId as Id<"clients">,
-    }) || [];
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
@@ -471,12 +462,12 @@ export default function ClientDetailView({ clientId }: ClientDetailViewProps) {
 
    const handleEditPayment = (payment: Payment) => {
     setPaymentForm({
-      amount: payment.amount?.toString() || "",
-      paidAmount: payment.paidAmount?.toString() || "",
+      amount: payment.amount?.toString() ?? "",
+      paidAmount: payment.paidAmount?.toString() ?? "",
       date: payment.date,
       description: payment.description,
-      status: payment.status,
-      details: payment.details || "",
+      status: (payment.status as "paid" | "pending") ?? "paid",
+      details: payment.details ?? "",
       id: payment._id,
     });
   };
@@ -545,24 +536,24 @@ export default function ClientDetailView({ clientId }: ClientDetailViewProps) {
     .toUpperCase()
     .substring(0, 2);
 
-  // totalBudget should be sum of all payments records (the "Target" amount)
-  const totalBudget = payments.reduce(
-    (sum: number, p: any) => sum + (p.amount || 0),
+  const totalBudget = paymentsList.reduce(
+    (sum: number, p: Payment) => sum + (p.amount || 0),
     0,
   );
   // totalPaid is sum of paidAmount field in payments
-  const totalPaid = payments.reduce((sum, p) => sum + (p.paidAmount || 0), 0);
+  const totalPaid = paymentsList.reduce((sum, p) => sum + (p.paidAmount || 0), 0);
 
   const pendingAmount = Math.max(0, totalBudget - totalPaid);
-  const activeProjects = projects.filter((p) => p.status !== "done").length;
-  const totalDeliverables = projects.reduce(
+  const activeProjects = projectsList.filter((p) => p.status !== "done").length;
+  const totalDeliverables = projectsList.reduce(
     (sum, p) => sum + p.deliverables.length,
     0,
   );
-  const nextDeadline = projects
+  const nextDeadline = projectsList
     .filter((p) => p.status !== "done")
     .sort(
-      (a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime(),
+      (a, b) =>
+        new Date(a.deadline ?? 0).getTime() - new Date(b.deadline ?? 0).getTime(),
     )[0]?.deadline;
 
   const today = new Date().toLocaleDateString("en-US", {
@@ -847,7 +838,7 @@ export default function ClientDetailView({ clientId }: ClientDetailViewProps) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--color-border)]">
-                {projects.length === 0 ? (
+                {projectsList.length === 0 ? (
                   <tr>
                     <td
                       colSpan={4}
@@ -857,7 +848,7 @@ export default function ClientDetailView({ clientId }: ClientDetailViewProps) {
                     </td>
                   </tr>
                 ) : (
-                  projects.map((project) => {
+                  projectsList.map((project) => {
                     const completed = project.deliverables.filter(
                       (d) => d.done,
                     ).length;
@@ -876,7 +867,7 @@ export default function ClientDetailView({ clientId }: ClientDetailViewProps) {
                               {project.projectName}
                             </span>
                             <span className="text-xs text-muted-foreground">
-                              ${project.budget.toLocaleString()}
+                              ${(project.budget ?? 0).toLocaleString()}
                             </span>
                           </div>
                         </td>
@@ -966,7 +957,7 @@ export default function ClientDetailView({ clientId }: ClientDetailViewProps) {
                     No sticky notes yet.
                   </p>
                 ) : (
-                  notes.map((note: any) => (
+                  notes.map((note: Note) => (
                     <div
                       key={note._id}
                       className={`w-10 h-10 rounded-lg border-2 shadow-sm transition-transform group-hover:scale-110 ${
@@ -1342,7 +1333,7 @@ export default function ClientDetailView({ clientId }: ClientDetailViewProps) {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
-                    {payments.length === 0 ? (
+                      {paymentsList.length === 0 ? (
                       <tr>
                         <td colSpan={5} className="py-24 text-center">
                           <div className="flex flex-col items-center gap-4 opacity-20">

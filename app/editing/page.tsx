@@ -370,7 +370,7 @@ export default function EditingPage() {
       done: [],
     };
     if (!cards) return g;
-    filteredCards.forEach((c) => g[c.status as keyof typeof g].push(c));
+    filteredCards.forEach((c: EditingCard) => g[c.status as EditingStatus].push(c));
     return g;
   }, [filteredCards, cards]);
 
@@ -834,7 +834,7 @@ export default function EditingPage() {
                       <option value="" className="bg-[#0f1117]">
                         {t("choose_client")}
                       </option>
-                      {clients.map((c) => (
+                      {clients.map((c: Client) => (
                         <option
                           key={c._id}
                           value={c._id}
