@@ -676,7 +676,7 @@ const nextDeadline = (Array.isArray(projectsList) ? projectsList : [])
                 <div
                   className={cn(
                     "w-1.5 h-1.5 rounded-full",
-                    client.status === "archived" ? "bg-red-500" : "bg-white/20",
+                    (client.status as string) === "archived" ? "bg-red-500" : "bg-white/20",
                   )}
                 />
                 Archive
