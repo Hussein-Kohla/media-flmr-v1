@@ -312,9 +312,18 @@ export default function ClientDetailView({ clientId }: ClientDetailViewProps) {
   const client = useQuery(api.clients.getClient, {
     id: clientId as Id<"clients">,
   }) as Client | undefined | null;
-  const projectsList = useQuery(api.projects.listProjectsByClient, { clientId: clientId as Id<"clients"> }) || [];
-  const paymentsList = useQuery(api.payments.listPaymentsByClient, { clientId: clientId as Id<"clients"> }) || [];
-  const notes = useQuery(api.notes.listNotesByClient, { clientId: clientId as Id<"clients"> }) || [];
+  const projectsList =
+    useQuery(api.projects.listProjectsByClient, {
+      clientId: clientId as Id<"clients">,
+    }) || [];
+  const paymentsList =
+    useQuery(api.payments.listPaymentsByClient, {
+      clientId: clientId as Id<"clients">,
+    }) || [];
+  const notes =
+    useQuery(api.notes.listNotesByClient, {
+      clientId: clientId as Id<"clients">,
+    }) || [];
   const updateClient = useMutation(api.clients.updateClient);
   const deleteClientMutation = useMutation(api.clients.deleteClient);
   const deleteProject = useMutation(api.projects.deleteProject);
@@ -329,7 +338,7 @@ export default function ClientDetailView({ clientId }: ClientDetailViewProps) {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
-   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [isExpandedNoteOpen, setIsExpandedNoteOpen] = useState(false);
   const [contactForm, setContactForm] = useState({
     email: "",
@@ -460,7 +469,7 @@ export default function ClientDetailView({ clientId }: ClientDetailViewProps) {
     }
   };
 
-   const handleEditPayment = (payment: Payment) => {
+  const handleEditPayment = (payment: Payment) => {
     setPaymentForm({
       amount: payment.amount?.toString() ?? "",
       paidAmount: payment.paidAmount?.toString() ?? "",
@@ -541,16 +550,21 @@ export default function ClientDetailView({ clientId }: ClientDetailViewProps) {
     0,
   );
   // totalPaid is sum of paidAmount field in payments
-  const totalPaid = (Array.isArray(paymentsList) ? paymentsList : []).reduce((sum, p: any) => sum + (p.paidAmount || 0), 0);
+  const totalPaid = (Array.isArray(paymentsList) ? paymentsList : []).reduce(
+    (sum, p: any) => sum + (p.paidAmount || 0),
+    0,
+  );
 
   const pendingAmount = Math.max(0, totalBudget - totalPaid);
-  const activeProjects = (Array.isArray(projectsList) ? projectsList : []).filter((p: any) => p.status !== "done").length;
-  const totalDeliverables = (Array.isArray(projectsList) ? projectsList : []).reduce(
-  (sum, p: any) => sum + (p.deliverables?.length || 0),
-  0
-);
-const nextDeadline = (Array.isArray(projectsList) ? projectsList : [])
-  .filter((p: any) => p.status !== "done");
+  const activeProjects = (
+    Array.isArray(projectsList) ? projectsList : []
+  ).filter((p: any) => p.status !== "done").length;
+  const totalDeliverables = (
+    Array.isArray(projectsList) ? projectsList : []
+  ).reduce((sum, p: any) => sum + (p.deliverables?.length || 0), 0);
+  const nextDeadline = (Array.isArray(projectsList) ? projectsList : []).filter(
+    (p: any) => p.status !== "done",
+  );
 
   const today = new Date().toLocaleDateString("en-US", {
     month: "short",
@@ -676,7 +690,9 @@ const nextDeadline = (Array.isArray(projectsList) ? projectsList : [])
                 <div
                   className={cn(
                     "w-1.5 h-1.5 rounded-full",
-                    (client.status as string) === "archived" ? "bg-red-500" : "bg-white/20",
+                    (client.status as string) === "archived"
+                      ? "bg-red-500"
+                      : "bg-white/20",
                   )}
                 />
                 Archive
@@ -834,7 +850,8 @@ const nextDeadline = (Array.isArray(projectsList) ? projectsList : [])
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--color-border)]">
-                {(Array.isArray(projectsList) ? projectsList.length : 0) === 0 ? (
+                {(Array.isArray(projectsList) ? projectsList.length : 0) ===
+                0 ? (
                   <tr>
                     <td
                       colSpan={4}
@@ -844,88 +861,91 @@ const nextDeadline = (Array.isArray(projectsList) ? projectsList : [])
                     </td>
                   </tr>
                 ) : (
-                  (Array.isArray(projectsList) ? projectsList : []).map((project: any) => {
-                    const completed = project.deliverables.filter(
-                      (d: any) => d.done,
-                    ).length;
-                    const progress =
-                      project.deliverables.length > 0
-                        ? (completed / project.deliverables.length) * 100
-                        : 0;
-                    return (
-                      <tr
-                        key={project._id}
-                        className="group hover:bg-muted/30 transition-colors"
-                      >
-                        <td className="py-4 pl-4">
-                          <div className="flex flex-col">
-                            <span className="font-bold text-foreground">
-                              {project.projectName}
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                              ${(project.budget ?? 0).toLocaleString()}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="py-4">
-                          <StatusBadge
-                            variant={getStatusVariant(project.status)}
-                          >
-                            {project.status}
-                          </StatusBadge>
-                        </td>
-                        <td className="py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-24 h-1.5 bg-muted rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-[var(--color-brand)]"
-                                style={{ width: `${progress}%` }}
-                              />
+                  (Array.isArray(projectsList) ? projectsList : []).map(
+                    (project: any) => {
+                      const completed = (project.deliverables ?? []).filter(
+                        (d: any) => d.done,
+                      ).length;
+                      const progress =
+                        (project.deliverables ?? []).length > 0
+                          ? (completed / (project.deliverables ?? []).length) *
+                            100
+                          : 0;
+                      return (
+                        <tr
+                          key={project._id}
+                          className="group hover:bg-muted/30 transition-colors"
+                        >
+                          <td className="py-4 pl-4">
+                            <div className="flex flex-col">
+                              <span className="font-bold text-foreground">
+                                {project.projectName}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                ${(project.budget ?? 0).toLocaleString()}
+                              </span>
                             </div>
-                            <span className="text-xs font-medium">
-                              {Math.round(progress)}%
-                            </span>
-                          </div>
-                        </td>
-                        <td className="py-4 text-right pr-4">
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleEditProject(project)}
-                              className="h-8 w-8"
+                          </td>
+                          <td className="py-4">
+                            <StatusBadge
+                              variant={getStatusVariant(project.status)}
                             >
-                              <Edit2 className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleDeleteProject(project._id)}
-                              className="h-8 w-8 text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                            {project.link && (
+                              {project.status}
+                            </StatusBadge>
+                          </td>
+                          <td className="py-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-24 h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-[var(--color-brand)]"
+                                  style={{ width: `${progress}%` }}
+                                />
+                              </div>
+                              <span className="text-xs font-medium">
+                                {Math.round(progress)}%
+                              </span>
+                            </div>
+                          </td>
+                          <td className="py-4 text-right pr-4">
+                            <div className="flex justify-end gap-2">
                               <Button
                                 variant="ghost"
                                 size="icon"
+                                onClick={() => handleEditProject(project)}
                                 className="h-8 w-8"
-                                asChild
                               >
-                                <a
-                                  href={project.link}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  <ExternalLink className="h-4 w-4" />
-                                </a>
+                                <Edit2 className="h-4 w-4" />
                               </Button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleDeleteProject(project._id)}
+                                className="h-8 w-8 text-destructive"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                              {project.link && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  asChild
+                                >
+                                  <a
+                                    href={project.link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    <ExternalLink className="h-4 w-4" />
+                                  </a>
+                                </Button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    },
+                  )
                 )}
               </tbody>
             </table>
@@ -1329,7 +1349,8 @@ const nextDeadline = (Array.isArray(projectsList) ? projectsList : [])
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
-                      {paymentsList.length === 0 ? (
+                    {(Array.isArray(paymentsList) ? paymentsList.length : 0) ===
+                    0 ? (
                       <tr>
                         <td colSpan={5} className="py-24 text-center">
                           <div className="flex flex-col items-center gap-4 opacity-20">
@@ -1341,86 +1362,89 @@ const nextDeadline = (Array.isArray(projectsList) ? projectsList : [])
                         </td>
                       </tr>
                     ) : (
-                      payments.map((payment) => {
-                        const remaining =
-                          payment.amount - (payment.paidAmount || 0);
-                        return (
-                          <tr
-                            key={payment._id}
-                            className="group hover:bg-white/[0.02] transition-colors"
-                          >
-                            <td className="py-6 pl-8">
-                              <span className="text-sm font-bold text-white/60">
-                                {payment.date}
-                              </span>
-                            </td>
-                            <td className="py-6">
-                              <div className="space-y-1">
-                                <p className="text-base font-bold text-white">
-                                  {payment.description}
-                                </p>
-                                {payment.details && (
-                                  <p className="text-xs text-white/30 truncate max-w-xs">
-                                    {payment.details}
+                      (Array.isArray(paymentsList) ? paymentsList : []).map(
+                        (payment: any) => {
+                          const remaining =
+                            payment.amount - (payment.paidAmount || 0);
+                          return (
+                            <tr
+                              key={payment._id}
+                              className="group hover:bg-white/[0.02] transition-colors"
+                            >
+                              <td className="py-6 pl-8">
+                                <span className="text-sm font-bold text-white/60">
+                                  {payment.date}
+                                </span>
+                              </td>
+                              <td className="py-6">
+                                <div className="space-y-1">
+                                  <p className="text-base font-bold text-white">
+                                    {payment.description}
+                                  </p>
+                                  {payment.details && (
+                                    <p className="text-xs text-white/30 truncate max-w-xs">
+                                      {payment.details}
+                                    </p>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="py-6">
+                                <div className="flex items-center gap-3">
+                                  <span className="text-lg font-black italic text-green-400">
+                                    $
+                                    {(payment.paidAmount || 0).toLocaleString()}
+                                  </span>
+                                  <span className="text-xs font-bold text-white/20">
+                                    /
+                                  </span>
+                                  <span className="text-sm font-bold text-white/40">
+                                    ${payment.amount.toLocaleString()}
+                                  </span>
+                                </div>
+                                {remaining > 0 && (
+                                  <p className="text-[9px] font-bold text-orange-500 uppercase tracking-widest mt-1">
+                                    Pending: ${remaining.toLocaleString()}
                                   </p>
                                 )}
-                              </div>
-                            </td>
-                            <td className="py-6">
-                              <div className="flex items-center gap-3">
-                                <span className="text-lg font-black italic text-green-400">
-                                  ${(payment.paidAmount || 0).toLocaleString()}
-                                </span>
-                                <span className="text-xs font-bold text-white/20">
-                                  /
-                                </span>
-                                <span className="text-sm font-bold text-white/40">
-                                  ${payment.amount.toLocaleString()}
-                                </span>
-                              </div>
-                              {remaining > 0 && (
-                                <p className="text-[9px] font-bold text-orange-500 uppercase tracking-widest mt-1">
-                                  Pending: ${remaining.toLocaleString()}
-                                </p>
-                              )}
-                            </td>
-                            <td className="py-6">
-                              <div
-                                className={cn(
-                                  "inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border",
-                                  payment.status === "paid"
-                                    ? "bg-green-500/10 text-green-400 border-green-500/20"
-                                    : "bg-orange-500/10 text-orange-400 border-orange-500/20",
-                                )}
-                              >
-                                {payment.status}
-                              </div>
-                            </td>
-                            <td className="py-6 text-right pr-8">
-                              <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleEditPayment(payment)}
-                                  className="h-10 w-10 bg-white/5 hover:bg-white/10 rounded-xl"
+                              </td>
+                              <td className="py-6">
+                                <div
+                                  className={cn(
+                                    "inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border",
+                                    payment.status === "paid"
+                                      ? "bg-green-500/10 text-green-400 border-green-500/20"
+                                      : "bg-orange-500/10 text-orange-400 border-orange-500/20",
+                                  )}
                                 >
-                                  <Edit2 className="h-4 w-4 text-[#8b5cf6]" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() =>
-                                    handleDeletePayment(payment._id)
-                                  }
-                                  className="h-10 w-10 bg-red-500/5 hover:bg-red-500/10 rounded-xl text-red-500"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })
+                                  {payment.status}
+                                </div>
+                              </td>
+                              <td className="py-6 text-right pr-8">
+                                <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleEditPayment(payment)}
+                                    className="h-10 w-10 bg-white/5 hover:bg-white/10 rounded-xl"
+                                  >
+                                    <Edit2 className="h-4 w-4 text-[#8b5cf6]" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() =>
+                                      handleDeletePayment(payment._id)
+                                    }
+                                    className="h-10 w-10 bg-red-500/5 hover:bg-red-500/10 rounded-xl text-red-500"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        },
+                      )
                     )}
                   </tbody>
                 </table>
@@ -1484,12 +1508,14 @@ const nextDeadline = (Array.isArray(projectsList) ? projectsList : [])
         </DialogContent>
       </Dialog>
 
-      <ExpandedNoteModal
-        isOpen={isExpandedNoteOpen}
-        onClose={() => setIsExpandedNoteOpen(false)}
-        note={selectedNote}
-        updateNote={updateNote}
-      />
+      {selectedNote && (
+        <ExpandedNoteModal
+          isOpen={isExpandedNoteOpen}
+          onClose={() => setIsExpandedNoteOpen(false)}
+          note={selectedNote}
+          updateNote={updateNote}
+        />
+      )}
     </div>
   );
 }

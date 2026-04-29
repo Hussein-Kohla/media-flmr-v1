@@ -6,6 +6,8 @@ import { useMemo, useState, useEffect } from "react";
 import { Users, CalendarDays, ArrowUpRight, Clock, Zap } from "lucide-react";
 import Link from "next/link";
 import { useApp } from "@/lib/context_fixed";
+type CalendarTask = any;
+type Project = any;
 
 function CountUp({ value }: { value: number }) {
   const [count, setCount] = useState(0);
@@ -72,7 +74,7 @@ export default function Home() {
 
   const activeProjects = useMemo(
     () =>
-      (projects ?? []).filter((p: Project) => p.status === "active" || !p.status),
+      (projects ?? []).filter((p: any) => p.status === "active" || !p.status),
     [projects],
   );
 
@@ -86,7 +88,7 @@ export default function Home() {
     { label: "Today's Tasks", value: todayTasks.length, href: "/calendar" },
     {
       label: "Publishing",
-       value: (projects ?? []).filter((p: Project) => p.status === "publishing")
+       value: (projects ?? []).filter((p: any) => p.status === "publishing")
         .length,
       href: "/publishing",
     },
