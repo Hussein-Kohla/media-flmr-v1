@@ -786,7 +786,7 @@ export default function EditingPage() {
                   >
                     {selectedFilePreview || thumbnailUrl ? (
                       <Image
-                        src={selectedFilePreview || thumbnailUrl || ""}
+                        src={(selectedFilePreview || (thumbnailUrl as any) || "") as string}
                         alt="Thumbnail"
                         className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
                         fill
