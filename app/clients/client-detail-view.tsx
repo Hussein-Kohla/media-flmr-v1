@@ -545,7 +545,10 @@ export default function ClientDetailView({ clientId }: ClientDetailViewProps) {
 
   const pendingAmount = Math.max(0, totalBudget - totalPaid);
   const activeProjects = (Array.isArray(projectsList) ? projectsList : []).filter((p: any) => p.status !== "done").length;
-  const totalDeliverables = projectsList.reduce(
+  const totalDeliverables = (Array.isArray(projectsList) ? projectsList : []).reduce(
+  (sum, p: any) => sum + (p.deliverables?.length || 0),
+  0,
+);
     (sum, p) => sum + p.deliverables.length,
     0,
   );
