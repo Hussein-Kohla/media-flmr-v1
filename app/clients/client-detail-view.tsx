@@ -549,12 +549,8 @@ export default function ClientDetailView({ clientId }: ClientDetailViewProps) {
   (sum, p: any) => sum + (p.deliverables?.length || 0),
   0
 );
-  const nextDeadline = projectsList
-    .filter((p) => p.status !== "done")
-    .sort(
-      (a, b) =>
-        new Date(a.deadline ?? 0).getTime() - new Date(b.deadline ?? 0).getTime(),
-    )[0]?.deadline;
+const nextDeadline = (Array.isArray(projectsList) ? projectsList : [])
+  .filter((p: any) => p.status !== "done");
 
   const today = new Date().toLocaleDateString("en-US", {
     month: "short",
