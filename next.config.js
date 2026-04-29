@@ -12,6 +12,15 @@ const nextConfig = {
       },
     ],
   },
+  // Optional: improve performance and Vercel compatibility
+  swcMinify: true,
+  reactStrictMode: true,
+  eslint: {
+    ignoreDuringBuilds: false, // Keep linting on for production
+  },
+  typescript: {
+    ignoreBuildErrors: false,   // Keep type checking on for production
+  },
 };
 
 module.exports = nextConfig;

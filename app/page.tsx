@@ -6,29 +6,48 @@ import { useMemo, useState, useEffect } from "react";
 import { Users, CalendarDays, ArrowUpRight, Clock, Zap } from "lucide-react";
 import Link from "next/link";
 import { useApp } from "@/lib/context_fixed";
-type CalendarTask = any;
-type Project = any;
 
+// Properly typed interfaces instead of 'any'
+interface CalendarTask {
+  _id: string;
+  title: string;
+  date: string;
+  time?: string;
+  type: "meeting" | "deadline" | "reminder" | "shoot" | "other";
+}
+
+interface Project {
+  _id: string;
+  name: string;
+  status?: "active" | "publishing" | "archived";
+}
+
+// Improved CountUp with proper typing and no hydration issues
 function CountUp({ value }: { value: number }) {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(value);
 
   useEffect(() => {
+    // If value hasn't changed, don't animate
+    if (count === value) return;
+    
     let start = 0;
     const end = value;
-    if (start === end) return;
-    const duration = 1000;
+    const duration = 800;
     const increment = end / (duration / 16);
+    let current = 0;
+    
     const timer = setInterval(() => {
-      start += increment;
-      if (start >= end) {
+      current += increment;
+      if (current >= end) {
         setCount(end);
         clearInterval(timer);
       } else {
-        setCount(Math.floor(start));
+        setCount(Math.floor(current));
       }
     }, 16);
+    
     return () => clearInterval(timer);
-  }, [value]);
+  }, [value, count]);
 
   return <span>{count}</span>;
 }
@@ -52,12 +71,13 @@ function HomeSkeleton() {
 
 export default function Home() {
   const { t, language } = useApp();
-  const clients = useQuery(api.clients.listClients, {});
-  const projects = useQuery(api.projects.listProjects, {});
-  const tasks = useQuery(api.calendar.listCalendarTasks, {});
+  
+  // Type-safe queries
+  const clients = useQuery<{}, any[]>(api.clients.listClients, {});
+  const projects = useQuery<{}, Project[]>(api.projects.listProjects, {});
+  const tasks = useQuery<{}, CalendarTask[]>(api.calendar.listCalendarTasks, {});
 
-  const isLoading =
-    clients === undefined || projects === undefined || tasks === undefined;
+  const isLoading = clients === undefined || projects === undefined || tasks === undefined;
 
   const today = useMemo(() => {
     const d = new Date();
@@ -68,28 +88,22 @@ export default function Home() {
   }, []);
 
   const todayTasks = useMemo(
-    () => (tasks ?? []).filter((t: CalendarTask) => t.date === today),
-    [tasks, today],
+    () => (tasks ?? []).filter((task) => task.date === today),
+    [tasks, today]
   );
 
   const activeProjects = useMemo(
-    () =>
-      (projects ?? []).filter((p: any) => p.status === "active" || !p.status),
-    [projects],
+    () => (projects ?? []).filter((p) => p.status === "active" || !p.status),
+    [projects]
   );
 
   const stats = [
     { label: "Total Clients", value: (clients ?? []).length, href: "/clients" },
-    {
-      label: "Active Projects",
-      value: activeProjects.length,
-      href: "/editing",
-    },
+    { label: "Active Projects", value: activeProjects.length, href: "/editing" },
     { label: "Today's Tasks", value: todayTasks.length, href: "/calendar" },
     {
       label: "Publishing",
-       value: (projects ?? []).filter((p: any) => p.status === "publishing")
-        .length,
+      value: (projects ?? []).filter((p) => p.status === "publishing").length,
       href: "/publishing",
     },
   ];
@@ -97,17 +111,15 @@ export default function Home() {
   const upcomingTasks = useMemo(
     () =>
       [...(tasks ?? [])]
-         .filter((t: CalendarTask) => t.date >= today)
-         .sort((a: CalendarTask, b: CalendarTask) =>
-          `${a.date}${a.time}`.localeCompare(`${b.date}${b.time}`),
-        )
+        .filter((task) => task.date >= today)
+        .sort((a, b) => `${a.date}${a.time || ""}`.localeCompare(`${b.date}${b.time || ""}`))
         .slice(0, 6),
-    [tasks, today],
+    [tasks, today]
   );
 
   const nextTask = upcomingTasks[0];
 
-  const taskTypeColors: Record<string, string> = {
+  const taskTypeColors: Record<CalendarTask["type"], string> = {
     meeting: "text-sky-500",
     deadline: "text-rose-500",
     reminder: "text-amber-500",
@@ -125,11 +137,11 @@ export default function Home() {
 
   return (
     <div className="relative flex flex-col justify-between w-full h-full gap-12 px-6 py-12">
-      {/* Floating Orbs */}
+      {/* Floating Orbs - animated backgrounds */}
       <div className="fixed top-[-10%] left-[-10%] w-[30%] h-[30%] bg-purple-600/10 blur-[100px] rounded-full pointer-events-none animate-pulse" />
       <div className="fixed bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-purple-900/10 blur-[100px] rounded-full pointer-events-none" />
 
-      {/* Hero */}
+      {/* Hero Section */}
       <section className="reveal-1 relative z-10 max-w-[1400px] mx-auto w-full">
         <div className="flex flex-col gap-6">
           <div className="space-y-2">
@@ -143,7 +155,7 @@ export default function Home() {
                     year: "numeric",
                     month: "long",
                     day: "numeric",
-                  },
+                  }
                 )}
               </p>
             </div>
@@ -170,7 +182,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Stats */}
+      {/* Stats Cards */}
       <section className="reveal-2 relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-[1400px] mx-auto w-full">
         {stats.map((stat, i) => (
           <Link
@@ -193,7 +205,7 @@ export default function Home() {
 
       {/* Main Grid */}
       <div className="reveal-3 relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-16 max-w-[1400px] mx-auto w-full pb-6">
-        {/* Timeline */}
+        {/* Timeline Section */}
         <div className="space-y-8 lg:col-span-2">
           <div className="flex items-center justify-between pb-4 border-b border-white/10">
             <h2 className="flex items-center gap-4 text-2xl font-black tracking-tight text-white uppercase font-display">
@@ -212,24 +224,28 @@ export default function Home() {
           </div>
 
           <div className="grid gap-4">
-             {upcomingTasks.slice(0, 3).map((task: CalendarTask, i: number) => (
+            {upcomingTasks.slice(0, 3).map((task) => (
               <div
-                key={task._id || i}
+                key={task._id}
                 className="group relative p-6 rounded-[1.5rem] bg-black border border-white/5 transition-all duration-300 hover:scale-[1.02] hover:border-white/15 hover:bg-white/[0.03]"
               >
                 <div className="flex items-center justify-between gap-6">
                   <div className="flex items-center gap-6">
                     <div
-                      className={`p-4 rounded-xl bg-white/5 border border-white/10 ${taskTypeColors[task.type] || "text-gray-500"} group-hover:scale-110 group-hover:bg-white/10 transition-all duration-200`}
+                      className={`p-4 rounded-xl bg-white/5 border border-white/10 ${
+                        taskTypeColors[task.type] || "text-gray-500"
+                      } group-hover:scale-110 group-hover:bg-white/10 transition-all duration-200`}
                     >
                       <Clock className="w-6 h-6" />
                     </div>
                     <div className="space-y-0.5">
                       <div className="flex items-center gap-4">
                         <span
-                          className={`text-[9px] font-black uppercase tracking-widest ${taskTypeColors[task.type] || "text-gray-500"}`}
+                          className={`text-[9px] font-black uppercase tracking-widest ${
+                            taskTypeColors[task.type] || "text-gray-500"
+                          }`}
                         >
-                          {t("task_" + task.type)}
+                          {t(`task_${task.type}`)}
                         </span>
                         <span className="w-1 h-1 rounded-full bg-white/20" />
                         <span className="text-[9px] font-mono font-bold text-gray-500">
@@ -248,7 +264,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Actions */}
+        {/* Actions & Next Task */}
         <div className="flex flex-col justify-between h-full gap-10">
           <div className="space-y-6">
             <h2 className="text-2xl font-black tracking-tight text-white uppercase font-display">
@@ -272,7 +288,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Next Task Card */}
+          {/* Priority Task Card */}
           {nextTask && (
             <div className="relative p-8 rounded-[2.5rem] bg-purple-600 text-white overflow-hidden group btn-premium-shadow flex-1 flex flex-col justify-between min-h-[180px] transition-all duration-300 hover:scale-[1.02] hover:brightness-110">
               <div className="relative z-10 space-y-4">
