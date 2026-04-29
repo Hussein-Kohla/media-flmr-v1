@@ -834,7 +834,7 @@ const nextDeadline = (Array.isArray(projectsList) ? projectsList : [])
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--color-border)]">
-                {projectsList.length === 0 ? (
+                {(Array.isArray(projectsList) ? projectsList.length : 0) === 0 ? (
                   <tr>
                     <td
                       colSpan={4}
