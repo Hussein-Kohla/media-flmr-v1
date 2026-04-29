@@ -98,7 +98,7 @@ export default function SettingsPage() {
   };
 
   // Display email from either profile or authUser
-  const userEmail = data?.profile?.email ?? authUser?.email ?? "";
+  const userEmail = (data as any)?.profile?.email ?? (authUser as any)?.email ?? "";
 
   return (
     <div className="relative min-h-screen w-full">
