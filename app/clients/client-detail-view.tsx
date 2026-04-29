@@ -668,7 +668,7 @@ const nextDeadline = (Array.isArray(projectsList) ? projectsList : [])
                 onClick={handleArchiveClient}
                 className={cn(
                   "h-9 px-5 rounded-xl font-bold text-xs transition-all flex items-center gap-2",
-                  client.status === "archived"
+                  (client.status as string) === "archived"
                     ? "bg-red-500/20 text-red-500 border border-red-500/30"
                     : "text-white/40 hover:text-white/60",
                 )}
