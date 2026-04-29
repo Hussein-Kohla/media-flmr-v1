@@ -30,7 +30,7 @@ export function ClientProfile({ client }: ClientProfileProps) {
           <div className="relative h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden border">
             {proofImageUrl ? (
               <Image
-                src={proofImageUrl}
+                src={(proofImageUrl as any) as string}
                 alt={client.name || "Client avatar"}
                 className="object-cover"
                 fill
