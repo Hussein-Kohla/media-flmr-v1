@@ -1,10 +1,11 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
 import { getUserIdFromToken, requireUser } from "./helpers";
+import { Id } from "./_generated/dataModel";
 
 export const listNotesByClient = query({
   args: { token: v.optional(v.string()), clientId: v.id("clients") },
-  handler: async (ctx: any, args: any) => {
+  handler: async (ctx, args) => {
     const userId = await getUserIdFromToken(ctx, args.token);
     if (!userId) return [];
     return await ctx.db
@@ -18,9 +19,11 @@ export const listNotesByClient = query({
 export const createNote = mutation({
   args: {
     token: v.optional(v.string()),
-    clientId: v.id("clients"), content: v.string(), color: v.string(),
+    clientId: v.id("clients"),
+    content: v.string(),
+    color: v.string(),
   },
-  handler: async (ctx: any, args: any) => {
+  handler: async (ctx, args) => {
     const { token, ...rest } = args;
     const userId = await requireUser(ctx, token);
     return await ctx.db.insert("notes", { ...rest, userId, updatedAt: Date.now() });
@@ -30,9 +33,11 @@ export const createNote = mutation({
 export const updateNote = mutation({
   args: {
     token: v.optional(v.string()),
-    noteId: v.id("notes"), content: v.optional(v.string()), color: v.optional(v.string()),
+    noteId: v.id("notes"),
+    content: v.optional(v.string()),
+    color: v.optional(v.string()),
   },
-  handler: async (ctx: any, args: any) => {
+  handler: async (ctx, args) => {
     const { token, noteId, ...updates } = args;
     await requireUser(ctx, token);
     await ctx.db.patch(noteId, { ...updates, updatedAt: Date.now() });
@@ -41,7 +46,7 @@ export const updateNote = mutation({
 
 export const deleteNote = mutation({
   args: { token: v.optional(v.string()), noteId: v.id("notes") },
-  handler: async (ctx: any, args: any) => {
+  handler: async (ctx, args) => {
     await requireUser(ctx, args.token);
     await ctx.db.delete(args.noteId);
   },

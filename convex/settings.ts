@@ -1,10 +1,11 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
 import { getUserIdFromToken, requireUser } from "./helpers";
+import { Id } from "./_generated/dataModel";
 
 export const getSettings = query({
   args: { token: v.optional(v.string()) },
-  handler: async (ctx: any, args: any) => {
+  handler: async (ctx, args) => {
     const userId = await getUserIdFromToken(ctx, args.token);
     if (!userId) return null;
     
@@ -36,7 +37,7 @@ export const updateProfile = mutation({
     avatar: v.optional(v.string()),
     waPhone: v.optional(v.string()),
   },
-  handler: async (ctx: any, args: any) => {
+  handler: async (ctx, args) => {
     const { token, ...updates } = args;
     const userId = await requireUser(ctx, token);
     await ctx.db.patch(userId, updates);
@@ -45,7 +46,7 @@ export const updateProfile = mutation({
 
 export const updateSettings = mutation({
   args: { token: v.optional(v.string()), agencyName: v.string() },
-  handler: async (ctx: any, args: any) => {
+  handler: async (ctx, args) => {
     const { token, ...rest } = args;
     const userId = await requireUser(ctx, token);
     const existing = await ctx.db
