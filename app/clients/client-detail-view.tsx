@@ -1459,7 +1459,7 @@ const nextDeadline = (Array.isArray(projectsList) ? projectsList : [])
 
           <div className="p-10 bg-muted/20">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-              {notes.length === 0 ? (
+              {(Array.isArray(notes) ? notes.length : 0) === 0 ? (
                 <div className="col-span-full py-20 text-center">
                   <p className="text-muted-foreground font-body italic">
                     No sticky notes yet. Create your first one!
