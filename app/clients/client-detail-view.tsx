@@ -844,7 +844,7 @@ const nextDeadline = (Array.isArray(projectsList) ? projectsList : [])
                     </td>
                   </tr>
                 ) : (
-                  projectsList.map((project) => {
+                  (Array.isArray(projectsList) ? projectsList : []).map((project: any) => {
                     const completed = project.deliverables.filter(
                       (d) => d.done,
                     ).length;
