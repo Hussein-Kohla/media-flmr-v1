@@ -948,7 +948,7 @@ const nextDeadline = (Array.isArray(projectsList) ? projectsList : [])
             </div>
             <div className="relative space-y-6">
               <div className="flex flex-wrap gap-3">
-                {notes.length === 0 ? (
+                {(Array.isArray(notes) ? notes.length : 0) === 0 ? (
                   <p className="text-sm font-body text-muted-foreground italic">
                     No sticky notes yet.
                   </p>
