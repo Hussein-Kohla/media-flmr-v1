@@ -541,7 +541,7 @@ export default function ClientDetailView({ clientId }: ClientDetailViewProps) {
     0,
   );
   // totalPaid is sum of paidAmount field in payments
-  const totalPaid = paymentsList.reduce((sum, p) => sum + (p.paidAmount || 0), 0);
+  const totalPaid = (Array.isArray(paymentsList) ? paymentsList : []).reduce((sum, p: any) => sum + (p.paidAmount || 0), 0);
 
   const pendingAmount = Math.max(0, totalBudget - totalPaid);
   const activeProjects = projectsList.filter((p) => p.status !== "done").length;
