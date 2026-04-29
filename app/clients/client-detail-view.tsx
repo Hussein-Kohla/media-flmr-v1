@@ -1466,7 +1466,7 @@ const nextDeadline = (Array.isArray(projectsList) ? projectsList : [])
                   </p>
                 </div>
               ) : (
-                notes.map((note: any) => (
+                (Array.isArray(notes) ? notes : []).map((note: any) => (
                   <StickyNote
                     key={note._id}
                     note={note}
